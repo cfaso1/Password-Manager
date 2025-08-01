@@ -41,6 +41,7 @@ class LoginScreen(tk.Frame):
         self.master_pwd.pack(pady=5)
         self.login_btn = tk.Button(self, text="Login", command=self.login)
         self.login_btn.pack(pady=5)
+        tk.Button(self, text=" Quit ", command=root.destroy).pack(pady=10)
 
     # Check password and go to home screen if correct
     def login(self):
@@ -60,8 +61,10 @@ class HomeScreen(tk.Frame):
         self.title = tk.Label(self, text="Welcome!", font=("Arial", 14), bg="lightblue")
         self.title.pack(pady=10)
 
-        tk.Button(self, text="New Password", command=lambda: show_frame(insertion)).pack(pady=10)
-        tk.Button(self, text="Find Password", command=lambda: show_frame(search)).pack(pady=10)
+        # Home Buttons
+        tk.Button(self, text="New Password", command=lambda: show_frame(insertion), width=10).pack(pady=10)
+        tk.Button(self, text="Find Password", command=lambda: show_frame(search), width=10).pack(pady=10)
+        tk.Button(self, text="Quit App", command=root.destroy, width=10).pack(pady=10)
 
 
 # Frame 3: Insertion
@@ -70,9 +73,6 @@ class InsertionScreen(tk.Frame):
         super().__init__(parent)
         self.configure(bg="lightblue")
         self.grid()
-
-        # Title
-        self.title = tk.Label(self, text="Enter Details", font=("Arial", 14), bg="lightblue").grid(row=0, column=0)
 
         # Website label and entry
         tk.Label(self, text = "Website: ", bg="lightblue", font=("Arial", 12), pady=10, padx=5).grid(row=1, column=0)
@@ -95,8 +95,11 @@ class InsertionScreen(tk.Frame):
         self.feedback_btn.grid(row=4, column=1)
 
         # Add password button
-        self.insert_btn = tk.Button(self, text="Add Password", command=self.insert, pady=5, width=10)
+        self.insert_btn = tk.Button(self, text="Add Password", command=self.insert, width=10)
         self.insert_btn.grid(row=0, column=1)
+
+        # Home button
+        tk.Button(self, text="Home", command=lambda: show_frame(home)).grid(row=0, column=0)
 
         # Random password button
         self.random_btn = tk.Button(self, text="Generate", command=self.generate_password, pady=5, width=5)
@@ -143,7 +146,6 @@ class InsertionScreen(tk.Frame):
             self.password.delete(0, tk.END)
             self.password.config(bg="white")
             self.random_btn.config(text="Generate")
-            self.feedback_btn.config(text="Feedback")
         else:
             # Change colors of fileds not filled in
             if not self.website.get():
@@ -175,7 +177,7 @@ class FeedbackScreen(tk.Frame):
         self.feedback.grid(row=2, column=0, columnspan=2)
 
         # Return Button
-        tk.Button(self, text="Use", command=lambda: self.exit_feedback(), padx=10).grid(row=1, column=1)
+        tk.Button(self, text="Back", command=lambda: self.exit_feedback(), padx=10).grid(row=1, column=1)
 
     # Initial password text and color
     def set_password(self):
@@ -198,25 +200,47 @@ class FeedbackScreen(tk.Frame):
 
     # Exit feedback and update fields
     def exit_feedback(self):
-        pyperclip.copy(self.password.get())
-        insertion.feedback_btn.config(text="Copied")
         insertion.password.delete(0, tk.END)
         insertion.password.insert(0, self.password.get())
         color_password(insertion.password)
         self.password.delete(0, tk.END)
         show_frame(insertion)
         
+
 # Frame 5: Search
 class SearchScreen(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.configure(bg="lightblue")
-        self.grid()
 
         # Title
-        self.title = tk.Label(self, text="Search", font=("Arial", 14), bg="lightblue")
-        self.title.grid(row=0, column=0)
+        tk.Label(self, text="Search For Password", font=("Arial", 14), bg="lightblue").pack(pady=10)
 
+        # Label, Entry, Button
+        self.title = tk.Label(self, text="Enter Website:", font=("Arial", 12), bg="lightblue")
+        self.title.pack(pady=5)
+        self.website = tk.Entry(self)
+        self.website.pack(pady=5)
+        tk.Button(self, text="Search", command=lambda: self.find_website()).pack(pady=5)
+        tk.Button(self, text="Home", command=lambda: show_frame(home)).pack(pady=5)
+
+    # Querey database
+    def find_website(self):
+        if self.website.get()=="test": # is in database
+            show_frame(view)
+        else:
+            self.title.config(text="Invalid Website:")
+
+
+# Frame 6: View
+class ViewScreen(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.configure(bg="lightblue")
+        self.grid()
+
+        tk.Label(self, text="data", font=("Arial", 14), bg="lightblue").grid(row=0, column=0)
+        
 
 # Initialize
 login = LoginScreen(root)
@@ -224,10 +248,11 @@ home = HomeScreen(root)
 insertion = InsertionScreen(root)
 feedback = FeedbackScreen(root)
 search = SearchScreen(root)
+view = ViewScreen(root)
 database = {}
 
 # Stack frames
-for frame in (login, home, insertion, feedback, search):
+for frame in (login, home, insertion, feedback, search, view):
     frame.grid(row=0, column=0, sticky="nsew")
 
 # Begin
