@@ -1,5 +1,5 @@
 import tkinter as tk # GUI
-import pyperclip # To copy to clipboard
+import pyperclip, platform # To copy to clipboard
 import password_checker # Password strength
 import random, string # Random password
 
@@ -227,6 +227,8 @@ class SearchScreen(tk.Frame):
     # Querey database
     def find_website(self):
         if self.website.get()=="test": # is in database
+            view = ViewScreen(root)
+            view.grid(row=0, column=0, sticky="nsew")
             show_frame(view)
         else:
             self.title.config(text="Invalid Website:")
@@ -239,8 +241,37 @@ class ViewScreen(tk.Frame):
         self.configure(bg="lightblue")
         self.grid()
 
-        tk.Label(self, text="data", font=("Arial", 14), bg="lightblue").grid(row=0, column=0)
+        # Data
+        website = search.website.get() 
+        username = "test" # Get from db 
+        password = "test" # Get from db
+
+        if len(website) > 20:
+            dsp_web = website
+        else:
+            dsp_web = website
+        if len(username) > 20:
+            dsp_usr = username
+        else:
+            dsp_usr = username
+        if len(password) > 20:
+            dsp_pwd = password
+        else:
+            dsp_pwd = password
+
+        # Labels 
+        tk.Label(self, text=f"Website: {dsp_web}", font=("Arial", 14), bg="lightblue", justify="left").grid(row=0, column=0)
+        tk.Label(self, text=f"Username: {dsp_usr}", font=("Arial", 14), bg="lightblue", justify="left", wraplength=250).grid(row=1, column=0)
+        tk.Label(self, text=f"Password: {dsp_pwd}", font=("Arial", 14), bg="lightblue", justify="left", wraplength=200).grid(row=2, column=0)
+
+        web_btn = tk.Button(self, text="Copy", command=lambda: (pyperclip.copy(website), web_btn.config(text="Copied")), width=5)
+        web_btn.grid(row=0, column=1)
+        usr_btn = tk.Button(self, text="Copy", command=lambda: (pyperclip.copy(username), usr_btn.config(text="Copied")), width=5)
+        usr_btn.grid(row=1, column=1)
+        pwd_btn = tk.Button(self, text="Copy", command=lambda: (pyperclip.copy(password), pwd_btn.config(text="Copied")), width=5)
+        pwd_btn.grid(row=2, column=1)
         
+        tk.Button(self, text="Back", command=lambda: show_frame(search)).grid(row=3, column=0)
 
 # Initialize
 login = LoginScreen(root)
@@ -248,12 +279,21 @@ home = HomeScreen(root)
 insertion = InsertionScreen(root)
 feedback = FeedbackScreen(root)
 search = SearchScreen(root)
-view = ViewScreen(root)
 database = {}
 
 # Stack frames
-for frame in (login, home, insertion, feedback, search, view):
+for frame in (login, home, insertion, feedback, search):
     frame.grid(row=0, column=0, sticky="nsew")
+
+# Copy to clipboard compatability
+os_name = platform.system()
+if os_name == "Linux":
+    pyperclip.set_clipboard("xclip")
+elif os_name == "Windows":
+    pyperclip.set_clipboard("windows")
+else:
+    raise RuntimeError(f"Unsupported OS: {os_name}")
+
 
 # Begin
 show_frame(login)
