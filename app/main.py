@@ -25,20 +25,6 @@ else:
     raise RuntimeError(f"Unsupported OS: {os_name}")
 
 
-# Utility to color password entry
-def color_password(entry):
-    pwd = entry.get()
-    strength = password_checker.pwd_strength(pwd)
-    if not pwd:
-        entry.config(bg="white")
-    elif strength == "Strong":
-        entry.config(bg="lightgreen")
-    elif strength == "Moderate":
-        entry.config(bg="yellow")
-    else:
-        entry.config(bg="red")
-
-
 # Central App class to control all screens
 class App(tk.Tk):
     def __init__(self):
@@ -89,6 +75,20 @@ class App(tk.Tk):
     def get_frame(self, screen_class):
         return self.frames.get(screen_class)
     
+    # Utility to color password entry
+    def color_password(self, entry):
+        pwd = entry.get()
+        strength = password_checker.pwd_strength(pwd)
+        if not pwd:
+            entry.config(bg="white")
+        elif strength == "Strong":
+            entry.config(bg="lightgreen")
+        elif strength == "Moderate":
+            entry.config(bg="yellow")
+        else:
+            entry.config(bg="red")
+
+
     # Initialize master password
     def set_master_password(self, password):
         self.salt = crypto.load_or_create_salt(self.db_folder)
@@ -143,7 +143,7 @@ class SetupScreen(tk.Frame):
         tk.Label(self, text="Create Master Password", font=("Araial", 14, "bold"), bg="lightblue").pack(pady=2)
         self.pwd1 = tk.Entry(self)
         self.pwd1.pack(pady=2)
-        self.pwd1.bind("<KeyRelease>", lambda event: color_password(self.pwd1))
+        self.pwd1.bind("<KeyRelease>", lambda event: self.app.color_password(self.pwd1))
 
         # Title and entry 2
         tk.Label(self, text="Confirm Password", font=("Araial", 14), bg="lightblue").pack(pady=2)
@@ -289,7 +289,7 @@ class InsertionScreen(tk.Frame):
         tk.Label(self, text="Password:", bg="lightblue", font=("Arial", 14)).grid(row=2, column=0, pady=5, padx=5)
         self.password = tk.Entry(self)
         self.password.grid(row=2, column=1)
-        self.password.bind("<KeyRelease>", lambda event: color_password(self.password))
+        self.password.bind("<KeyRelease>", lambda event: self.app.color_password(self.password))
 
         # Buttons
         self.insert_btn = tk.Button(self, text="Add Password", command=self.insert, width=10)
@@ -306,7 +306,7 @@ class InsertionScreen(tk.Frame):
     def insert(self):
         self.website.config(bg="white")
         self.username.config(bg="white")
-        color_password(self.password)
+        self.app.color_password(self.password)
 
         # Add new database entry if fields are filled in
         website, username, password = self.website.get(), self.username.get(), self.password.get()
@@ -328,7 +328,7 @@ class InsertionScreen(tk.Frame):
         password = ''.join(random.choice(chars) for _ in range(LENGTH))
         self.password.delete(0, tk.END)
         self.password.insert(0, password)
-        color_password(self.password)
+        self.app.color_password(self.password)
         pyperclip.copy(password)
         self.random_btn.config(text="Copied")
 
@@ -358,7 +358,7 @@ class FeedbackScreen(tk.Frame):
         self.password = tk.Entry(self)
         self.password.grid(row=1, column=0)
         self.password.delete(0, tk.END)
-        self.password.bind("<KeyRelease>", lambda e: (color_password(self.password), self.set_feedback()))
+        self.password.bind("<KeyRelease>", lambda e: (self.app.color_password(self.password), self.set_feedback()))
 
         # Feedback
         self.feedback = tk.Text(self, bg="lightblue", font=("Arial", 12), width=32, wrap="word", state="disabled")
@@ -379,7 +379,7 @@ class FeedbackScreen(tk.Frame):
     # Set password in feedback
     def set_password(self, pwd):
         self.password.insert(0, pwd)
-        color_password(self.password)
+        self.app.color_password(self.password)
         self.set_feedback()
 
     # Generate the feedback using password_checker.py
@@ -401,7 +401,7 @@ class FeedbackScreen(tk.Frame):
     def back(self, screen, field):
         field.delete(0, tk.END)
         field.insert(0, self.password.get())
-        color_password(field)
+        self.app.color_password(field)
         self.app.show_frame(screen)
         self.app.frames[FeedbackScreen].destroy()
         del self.app.frames[FeedbackScreen]
@@ -553,10 +553,10 @@ class EditScreen(tk.Frame):
 
     # Feedback Button if editing password
     def set_feedback(self):
-        color_password(self.change)
+        self.app.color_password(self.change)
         feedback_btn = tk.Button(self, text="Feedback", command=self.to_feedback)
         feedback_btn.pack(pady=5)
-        self.change.bind("<KeyRelease>", lambda event: color_password(self.change))
+        self.change.bind("<KeyRelease>", lambda event: self.app.color_password(self.change))
 
     # Get data
     def get_data(self, website, username, password):
