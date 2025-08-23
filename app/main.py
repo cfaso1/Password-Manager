@@ -4,14 +4,7 @@ import pyperclip, platform # Copying to clipboard
 import random, string # Random password generation
 import password_checker # Password strength check
 import database, crypto, os # Database and data encryption
-from pathlib import Path
-
-# TODO
-# Fix GUI scaling
-# Push to git
-# test on linux again
-# make windows app
-# Final upload to git
+from pathlib import Path # Database folder creation
 
 # Clipboard setup
 os_name = platform.system()
@@ -24,7 +17,6 @@ elif os_name == "Darwin":
 else:
     raise RuntimeError(f"Unsupported OS: {os_name}")
 
-
 # Central App class to control all screens
 class App(tk.Tk):
     def __init__(self):
@@ -34,11 +26,6 @@ class App(tk.Tk):
         self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-
-        # Fonts
-        tkfont.nametofont("TkDefaultFont").configure(family="Ubuntu", size=10)
-        tkfont.nametofont("TkTextFont").configure(family="Ubuntu", size=10)
-        tkfont.nametofont("TkFixedFont").configure(family="Ubuntu Mono", size=10)
 
         # Dictionary to store all screen instances
         self.frames = {}
@@ -87,7 +74,6 @@ class App(tk.Tk):
             entry.config(bg="yellow")
         else:
             entry.config(bg="red")
-
 
     # Initialize master password
     def set_master_password(self, password):
@@ -151,9 +137,9 @@ class SetupScreen(tk.Frame):
         self.pwd2.pack(pady=2)
 
         # Buttons
-        self.set_btn = tk.Button(self, text="Set Password", command=self.check_pwd, width=9)
+        self.set_btn = tk.Button(self, text="Set Password", command=self.check_pwd, width=10)
         self.set_btn.pack(pady=2)
-        self.feedback_btn = tk.Button(self, text="Feedback", command=self.to_feedback, width=9)
+        self.feedback_btn = tk.Button(self, text="Feedback", command=self.to_feedback, width=10)
         self.feedback_btn.pack(pady=2)
 
     # Confirm passwords match and recolor if not
@@ -202,19 +188,18 @@ class LoginScreen(tk.Frame):
 
         # Title and entry
         tk.Label(self, text="Enter Master Password:", font=("Arial", 14, "bold"), bg="lightblue").pack(pady=5)
-        self.master_pwd = tk.Entry(self, show='*')
+        self.master_pwd = tk.Entry(self, show='*', font=("Arial", 12))
         self.master_pwd.pack(pady=5)
 
         # Login and quit buttons
-        self.login_btn = tk.Button(self, text="Login", command=self.login, width=6)
+        self.login_btn = tk.Button(self, text="Login", command=self.login, width=9)
         self.login_btn.pack(pady=5)
-        tk.Button(self, text="Quit", command=lambda: self.app.quit(), width=6).pack(pady=5)
+        tk.Button(self, text="Quit", command=lambda: self.app.quit(), width=9).pack(pady=5)
 
         # Throttling
         self.throttle = tk.Label(self, bg="lightblue")
         self.throttle.pack(pady=5)
         self.failed_count = 0
-
 
     # Check master password and login
     def login(self):
@@ -266,9 +251,9 @@ class HomeScreen(tk.Frame):
         self.title.pack(pady=8)
 
         # Buttons
-        tk.Button(self, text="New Password", command=lambda: app.show_frame(InsertionScreen), width=10).pack(pady=8)
-        tk.Button(self, text="Find Password", command=lambda: app.show_frame(SearchScreen), width=10).pack(pady=8)
-        tk.Button(self, text="Quit App", command=lambda: self.app.quit(), width=10).pack(pady=8)
+        tk.Button(self, text="New Password", command=lambda: app.show_frame(InsertionScreen), width=12).pack(pady=8)
+        tk.Button(self, text="Find Password", command=lambda: app.show_frame(SearchScreen), width=12).pack(pady=8)
+        tk.Button(self, text="Quit App", command=lambda: self.app.quit(), width=12).pack(pady=8)
 
 
 # Frame: Insertion
@@ -279,28 +264,28 @@ class InsertionScreen(tk.Frame):
 
         # Form titles and entries
         tk.Label(self, text="Website:", bg="lightblue", font=("Arial", 14)).grid(row=0, column=0, pady=5, padx=5)
-        self.website = tk.Entry(self)
+        self.website = tk.Entry(self, font=("Arial", 10))
         self.website.grid(row=0, column=1)
 
         tk.Label(self, text="Username:", bg="lightblue", font=("Arial", 14)).grid(row=1, column=0, pady=5, padx=5)
-        self.username = tk.Entry(self)
+        self.username = tk.Entry(self, font=("Arial", 10))
         self.username.grid(row=1, column=1)
 
         tk.Label(self, text="Password:", bg="lightblue", font=("Arial", 14)).grid(row=2, column=0, pady=5, padx=5)
-        self.password = tk.Entry(self)
+        self.password = tk.Entry(self, font=("Arial", 10))
         self.password.grid(row=2, column=1)
         self.password.bind("<KeyRelease>", lambda event: self.app.color_password(self.password))
 
         # Buttons
-        self.insert_btn = tk.Button(self, text="Add Password", command=self.insert, width=10)
+        self.insert_btn = tk.Button(self, text="Add Password", command=self.insert, width=12)
         self.insert_btn.grid(row=4, column=1, pady=5)
 
-        tk.Button(self, text="Home", command=self.to_home).grid(row=4, column=0)
+        tk.Button(self, text="Home", command=self.to_home, width=7).grid(row=4, column=0)
 
-        self.random_btn = tk.Button(self, text="Generate", width=5, command=self.generate_password)
+        self.random_btn = tk.Button(self, text="Generate", width=7, command=self.generate_password)
         self.random_btn.grid(row=3, column=0, pady=5)
 
-        tk.Button(self, text="Feedback", command=self.to_feedback, width=10).grid(row=3, column=1, pady=5)
+        tk.Button(self, text="Feedback", command=self.to_feedback, width=12).grid(row=3, column=1, pady=5)
 
     # Confirm all fields are filled in then update database
     def insert(self):
@@ -355,7 +340,7 @@ class FeedbackScreen(tk.Frame):
         tk.Label(self, text="Password Feedback", font=("Arial", 14, "bold"), bg="lightblue", width=30).grid(row=0, column=0, columnspan=2)
 
         # Entry
-        self.password = tk.Entry(self)
+        self.password = tk.Entry(self, font=("Arial", 10))
         self.password.grid(row=1, column=0)
         self.password.delete(0, tk.END)
         self.password.bind("<KeyRelease>", lambda e: (self.app.color_password(self.password), self.set_feedback()))
@@ -419,7 +404,7 @@ class SearchScreen(tk.Frame):
         self.web_title.pack(pady=2)
 
         # Entry
-        self.website = tk.Entry(self)
+        self.website = tk.Entry(self, font=("Arial", 10))
         self.website.pack(pady=2)
 
         # Buttons
@@ -460,11 +445,11 @@ class ViewScreen(tk.Frame):
         self.password = None
 
         # Data Titles
-        self.web_data = tk.Label(self, bg="lightblue", font=("Arial", 14, "bold"), width=30)
+        self.web_data = tk.Label(self, bg="lightblue", font=("Arial", 14, "bold"), width=25)
         self.web_data.grid(row=0, column=0, columnspan=2)
-        self.usr_data = tk.Label(self, bg="lightblue", font=("Arial", 14), width=30)
+        self.usr_data = tk.Label(self, bg="lightblue", font=("Arial", 14), width=25)
         self.usr_data.grid(row=1, column=0, columnspan=2)
-        self.pwd_data = tk.Label(self, bg="lightblue", font=("Arial", 14), width=30)
+        self.pwd_data = tk.Label(self, bg="lightblue", font=("Arial", 14), width=25)
         self.pwd_data.grid(row=2, column=0, columnspan=2)
 
         # Copy Buttons
@@ -543,13 +528,13 @@ class EditScreen(tk.Frame):
         self.title.pack(pady=5)
 
         # Entry
-        self.change = tk.Entry(self)
+        self.change = tk.Entry(self, font=("Arial", 10))
         self.change.pack(pady=5)
 
         # Buttons
-        self.edit_btn = tk.Button(self, text="Edit", command=self.confirm_edit, width=5)
+        self.edit_btn = tk.Button(self, text="Edit", command=self.confirm_edit, width=7)
         self.edit_btn.pack(pady=5)
-        tk.Button(self, text="Cancel", command=self.to_view, width=5).pack(pady=5)
+        tk.Button(self, text="Cancel", command=self.to_view, width=7).pack(pady=5)
 
     # Feedback Button if editing password
     def set_feedback(self):
