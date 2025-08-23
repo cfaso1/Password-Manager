@@ -5,11 +5,11 @@ from cryptography.fernet import Fernet
 
 SALT_FILE = "salt.bin"
 
-def load_or_create_salt():
-    if not os.path.exists(SALT_FILE):
-        with open(SALT_FILE, "wb") as f:
+def load_or_create_salt(db_folder):
+    if not os.path.exists(db_folder / SALT_FILE):
+        with open(db_folder / SALT_FILE, "wb") as f:
             f.write(os.urandom(16))
-    with open(SALT_FILE, "rb") as f:
+    with open(db_folder / SALT_FILE, "rb") as f:
         return f.read()
     
 def derive_key(master_password: str, salt: bytes) -> bytes:

@@ -3,8 +3,8 @@ from crypto import encrypt, decrypt
 
 DB_FILE = "vault.db"
 
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
+def init_db(db_folder):
+    conn = sqlite3.connect(db_folder / DB_FILE)
     cursor = conn.cursor()
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS vault (

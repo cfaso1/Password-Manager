@@ -1,9 +1,17 @@
 import tkinter as tk # GUI
+import tkinter.font as tkfont # Fonts
 import pyperclip, platform # Copying to clipboard
 import random, string # Random password generation
 import password_checker # Password strength check
 import database, crypto, os # Database and data encryption
+from pathlib import Path
 
+# TODO
+# Fix GUI scaling
+# Push to git
+# test on linux again
+# make windows app
+# Final upload to git
 
 # Clipboard setup
 os_name = platform.system()
@@ -15,6 +23,7 @@ elif os_name == "Darwin":
     pyperclip.set_clipboard("pbcopy")
 else:
     raise RuntimeError(f"Unsupported OS: {os_name}")
+
 
 # Utility to color password entry
 def color_password(entry):
@@ -40,6 +49,11 @@ class App(tk.Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Fonts
+        tkfont.nametofont("TkDefaultFont").configure(family="Ubuntu", size=10)
+        tkfont.nametofont("TkTextFont").configure(family="Ubuntu", size=10)
+        tkfont.nametofont("TkFixedFont").configure(family="Ubuntu Mono", size=10)
+
         # Dictionary to store all screen instances
         self.frames = {}
 
@@ -47,14 +61,20 @@ class App(tk.Tk):
         self.salt = None
         self.db_conn = None
         self.encryption_key = None
-        
+
+        # Create database directory
+        script_dir = Path(__file__).resolve().parent
+        parent_dir = script_dir.parent
+        self.db_folder = parent_dir / "database"
+        self.db_folder.mkdir(parents=True, exist_ok=True)
+
         # Check if database exists
-        if not os.path.exists("vault.db"):
+        if not os.path.exists(self.db_folder / "vault.db"): 
             self.show_frame(InitialScreen)
         else:
             self.show_frame(LoginScreen) 
-            self.salt = crypto.load_or_create_salt()
-            self.db_conn = database.init_db()
+            self.salt = crypto.load_or_create_salt(self.db_folder)
+            self.db_conn = database.init_db(self.db_folder)
 
     # Used to swtich frames
     def show_frame(self, screen_class):
@@ -71,8 +91,8 @@ class App(tk.Tk):
     
     # Initialize master password
     def set_master_password(self, password):
-        self.salt = crypto.load_or_create_salt()
-        self.db_conn = database.init_db()
+        self.salt = crypto.load_or_create_salt(self.db_folder)
+        self.db_conn = database.init_db(self.db_folder)
         self.encryption_key = crypto.derive_key(password, self.salt)
         database.store_check_value(self.db_conn, self.encryption_key)
 
