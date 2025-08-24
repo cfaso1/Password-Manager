@@ -66,19 +66,6 @@ pip install -r requirements.txt
 python -m app.main
 ```
 
-### Create App (Optional)
-```bash
-# Install pyinstaller
-$ pip install pyinstaller
-
-# Create app
-$ python -m PyInstaller --onedir --windowed --name PasswordManager --icon=app/app.ico app/main.py
-```
-- This will create a `dist` folder with `_internal` folder and `PasswordManager` app (file type depends on operating system)
-- Running this app will launch the program
-- To add this app to desktop:
-  - Right click > Show more options (Windows 11) > Send to > Desktop (create shortcut)
-
 ### Data Backup
 
 - The database folder is stored next to the app in the `database` folder
@@ -95,19 +82,19 @@ $ python -m PyInstaller --onedir --windowed --name PasswordManager --icon=app/ap
     - Again, this will delete all saved passwords
     - This will reset the database and create a new one
 
-### Install from zip (Windows)
+### Install from zip 
 
-- Download given zip folder
-- Right click `PasswordManager-Windows.zip` file
+- Download given zip folder from releases 
+- Right click `PasswordManager-[YOUR OS].zip` file
 - Select `Extract all`
 - Select destination to extract to
     - This will be where the passwords and app is stored
     - Choose a location that will not be deleted
 - Open the extracted folder
-- The `PasswordManager.exe` is the application
+- The `PasswordManager` is the application
 - Running this app will launch the program
-- To add this app to desktop:
-  - Right click > Show more options (Windows 11) > Send to > Desktop (create shortcut)
+- To add this app to desktop (Windows):
+  - Right click > Show more options > Send to > Desktop (create shortcut)
 
 
 ## 📄 License
