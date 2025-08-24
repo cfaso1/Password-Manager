@@ -1,9 +1,8 @@
 import tkinter as tk # GUI
-import tkinter.font as tkfont # Fonts
-import pyperclip, platform # Copying to clipboard
+import pyperclip, platform, os # Copying to clipboard
 import random, string # Random password generation
-import password_checker # Password strength check
-import database, crypto, os # Database and data encryption
+from app import password_checker # Password strength check
+from app import database, crypto # Database and data encryption
 from pathlib import Path # Database folder creation
 
 # Clipboard setup
